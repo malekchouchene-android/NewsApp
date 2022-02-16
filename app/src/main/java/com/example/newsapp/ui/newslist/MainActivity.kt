@@ -1,4 +1,4 @@
-package com.example.newsapp.ui.home
+package com.example.newsapp.ui.newslist
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,24 +8,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import com.example.newsapp.R
 import com.example.newsapp.ui.theme.NewsAppTheme
 import com.example.newsapp.ui.utilis.formatError
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
-    val viewModel: NewsListViewModel by viewModel()
+    private val viewModel: NewsListViewModel by viewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             NewsAppTheme {
                 val scaffoldState = rememberScaffoldState()
-                val scopeScaffold = rememberCoroutineScope()
                 Scaffold(
                     scaffoldState = scaffoldState,
                     content = { innerPadding ->
@@ -53,7 +50,7 @@ class MainActivity : ComponentActivity() {
                                             }
                                         } else {
                                             NewsListCompose(news = uiState.value.news)
-                                            scopeScaffold.launch {
+                                            LaunchedEffect(scaffoldState) {
                                                 val snackBarResult =
                                                     scaffoldState.snackbarHostState.showSnackbar(
                                                         message = getString(uiStateValue.throwable.formatError()),

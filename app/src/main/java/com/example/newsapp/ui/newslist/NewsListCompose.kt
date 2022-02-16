@@ -1,4 +1,4 @@
-package com.example.newsapp.ui.home
+package com.example.newsapp.ui.newslist
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*

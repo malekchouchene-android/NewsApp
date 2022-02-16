@@ -5,7 +5,7 @@ import com.example.newsapp.data.network.NewsApi
 import com.example.newsapp.data.repositories.NewsListRepositoryImp
 import com.example.newsapp.domain.NewsList.NewsListRepository
 import com.example.newsapp.domain.NewsList.NewsListUseCase
-import com.example.newsapp.ui.home.NewsListViewModel
+import com.example.newsapp.ui.newslist.NewsListViewModel
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.androidx.viewmodel.dsl.viewModel
