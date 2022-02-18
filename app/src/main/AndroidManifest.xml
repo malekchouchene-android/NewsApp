@@ -15,11 +15,12 @@
         <activity
             android:name=".ui.newsDetails.NewsDetailsActivity"
             android:theme="@style/Theme.NewsApp"
+            android:screenOrientation="sensorPortrait"
             android:exported="false" />
         <activity
             android:name=".ui.newslist.NewsListActivity"
             android:exported="true"
-            android:label="@string/app_name"
+            android:screenOrientation="sensorPortrait"
             android:theme="@style/Theme.NewsApp">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
