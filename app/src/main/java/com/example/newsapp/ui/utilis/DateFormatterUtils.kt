@@ -1,6 +1,5 @@
 package com.example.newsapp.ui.utilis
 
-import android.util.Log
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -13,7 +12,6 @@ fun String?.toLocalDate(dateFormat: String = DateTimeFormatJson): Date? {
             val simpleDateFormat = SimpleDateFormat(dateFormat, Locale.getDefault())
             simpleDateFormat.parse(it)
         } catch (e: Throwable) {
-            Log.e("toLocalDate", e.toString())
             null
         }
     }

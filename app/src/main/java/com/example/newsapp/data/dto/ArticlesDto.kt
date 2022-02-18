@@ -18,7 +18,7 @@ data class Articles(
 )
 
 fun Articles.toDomain(dateFormat: String): News? {
-    if (title == null) return null
+    if (title.isNullOrBlank()) return null
     return News(
         title = title,
         imageUrl = urlToImage,

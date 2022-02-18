@@ -12,9 +12,6 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 class NewsListViewModel(private val newsListUseCase: NewsListUseCase) : ViewModel() {
-    companion object {
-        val TAG_LOG = NewsListViewModel::class.simpleName
-    }
 
     private val _uiState: MutableStateFlow<NewsListUiState> =
         MutableStateFlow(NewsListUiState(emptyList(), false, true, null))
