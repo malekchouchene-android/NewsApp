@@ -1,8 +1,10 @@
 <resources>
     <string name="app_name">NewsApp</string>
+    <string name="news_list_title">Dernières nouvelles</string>
     <string name="unexpected_error">Une erreur est survenue</string>
     <string name="no_network_error">Vérifier votre connexion</string>
     <string name="retry">Réessayer</string>
     <string name="empty_news_list">Pas d\'actualités disponibles </string>
     <string name="published_at">publiée le %s</string>
+    <string name="see_more">Voir plus</string>
 </resources>

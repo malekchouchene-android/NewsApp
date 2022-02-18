@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 class NewsListUseCase(private val newsListRepository: NewsListRepository) {
-    suspend fun getNewListByCountry(locale: Locale): Flow<Result<List<News>>> {
-        return newsListRepository.getNewsListByCountry(local = locale)
+    suspend fun getNewListByCountry(locale: Locale, dateFormat: String): Flow<Result<List<News>>> {
+        return newsListRepository.getNewsListByCountry(local = locale, dateFormat = dateFormat)
     }
 }

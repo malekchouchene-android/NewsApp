@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 const val DateTimeFormatJson = "yyyy-MM-dd'T'HH:mm:ss'Z'"
+const val DateFormatNews = "dd/MM/yyyy hh:mm"
 
 fun String?.toLocalDate(dateFormat: String = DateTimeFormatJson): Date? {
     return this?.let {

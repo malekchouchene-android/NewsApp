@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newsapp.domain.NewsList.NewsListUseCase
 import com.example.newsapp.domain.models.News
+import com.example.newsapp.ui.utilis.DateFormatNews
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
@@ -25,7 +26,7 @@ class NewsListViewModel(private val newsListUseCase: NewsListUseCase) : ViewMode
 
     fun getNewsList() {
         viewModelScope.launch {
-            newsListUseCase.getNewListByCountry(Locale.FRANCE)
+            newsListUseCase.getNewListByCountry(Locale.FRANCE, DateFormatNews)
                 .collect { result ->
                     result.onSuccess {
                         _uiState.value = NewsListUiState(it, false, false, null)

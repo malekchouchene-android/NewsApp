@@ -1,6 +1,7 @@
 package com.example.newsapp.data.dto
 
 import com.example.newsapp.domain.models.News
+import com.example.newsapp.ui.utilis.formatSting
 import com.example.newsapp.ui.utilis.toLocalDate
 import com.google.gson.annotations.SerializedName
 
@@ -16,15 +17,13 @@ data class Articles(
     @SerializedName("content") val content: String?
 )
 
-fun Articles.toDomain(): News? {
+fun Articles.toDomain(dateFormat: String): News? {
     if (title == null) return null
     return News(
         title = title,
         imageUrl = urlToImage,
         redirectLink = url,
         description = description,
-        publishedAt = publishedAt?.toLocalDate(),
-        source = source?.name
+        publishedAt = publishedAt?.toLocalDate()?.formatSting(dateFormat),
     )
 }
-

@@ -1,15 +1,16 @@
 package com.example.newsapp.ui.newslist
 
+import android.graphics.drawable.Drawable
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.material.Button
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,8 +24,10 @@ import com.example.newsapp.R
 import com.example.newsapp.domain.models.News
 import com.example.newsapp.ui.theme.Shapes
 import com.example.newsapp.ui.theme.Typography
-import com.example.newsapp.ui.utilis.formatSting
+import com.example.newsapp.ui.utilis.formatError
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
@@ -67,7 +70,7 @@ fun ErrorStateComposePreview() {
 }
 
 @Composable
-fun NewsListItem(news: News) {
+fun NewsListItem(news: News, onNewsClicked: ((News) -> Unit)?) {
     val placeHolder = ContextCompat.getDrawable(
         LocalContext.current,
         R.drawable.news_image_placeholder
@@ -75,7 +78,10 @@ fun NewsListItem(news: News) {
     Card(
         Modifier
             .fillMaxWidth()
-            .wrapContentHeight(),
+            .wrapContentHeight()
+            .clickable {
+                onNewsClicked?.invoke(news)
+            },
         shape = Shapes.medium,
         elevation = 4.dp
     ) {
@@ -87,35 +93,22 @@ fun NewsListItem(news: News) {
                 8.dp
             )
         ) {
-            GlideImage(
-                imageModel = news.imageUrl,
-                contentDescription = null,
-                contentScale = ContentScale.FillWidth,
-                placeHolder = rememberDrawablePainter(
-                    placeHolder
-                ),
-                error = rememberDrawablePainter(
-                    placeHolder
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .defaultMinSize(minHeight = 200.dp)
-                    .clip(
-                        Shapes.medium.copy(
-                            bottomEnd = CornerSize(0),
-                            bottomStart = CornerSize(0)
-                        )
+            NewsImageCompose(
+                news.imageUrl,
+                placeholder = placeHolder,
+                modifier = Modifier.clip(
+                    shape = Shapes.medium.copy(
+                        bottomStart = CornerSize(0),
+                        bottomEnd = CornerSize(0)
                     )
-
+                )
             )
-            Text(
-                text = news.title,
-                Modifier.padding(horizontal = 8.dp),
-                style = Typography.body1
+            NewsTitle(
+                news = news,
+                modifier = Modifier.padding(horizontal = 8.dp)
             )
-
             val dateOfPublishing =
-                news.publishedAt?.formatSting("dd/MM/yyyy hh:mm")
+                news.publishedAt
             if (dateOfPublishing != null) {
                 Text(
                     text = stringResource(
@@ -139,14 +132,14 @@ fun PreviewNewsListItem() {
             imageUrl = "test",
             description = null,
             null,
-            null,
-            null
+            "13/02/2022 15:30",
         )
-    )
+    ) {
+    }
 }
 
 @Composable
-fun NewsListCompose(news: List<News>) {
+fun NewsListCompose(news: List<News>, onNewsClicked: ((News) -> Unit)?) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize(),
@@ -154,7 +147,128 @@ fun NewsListCompose(news: List<News>) {
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         items(news) {
-            NewsListItem(news = it)
+            NewsListItem(news = it, onNewsClicked)
         }
     }
+}
+
+@Composable
+fun NewsImageCompose(url: String?, placeholder: Drawable?, modifier: Modifier) {
+    GlideImage(
+        imageModel = url,
+        contentDescription = null,
+        contentScale = ContentScale.FillWidth,
+        placeHolder = rememberDrawablePainter(
+            placeholder
+        ),
+        error = rememberDrawablePainter(
+            placeholder
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(16F / 9F)
+            .then(modifier)
+    )
+}
+
+@Composable
+fun NewsTitle(news: News, modifier: Modifier) {
+    Text(
+        text = news.title,
+        modifier,
+        style = Typography.h4
+    )
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun ShowSnackBarError(
+    scaffoldState: ScaffoldState,
+    message: String,
+    actionLabel: String,
+    action: (() -> Unit)?
+) {
+    LaunchedEffect(scaffoldState) {
+        val snackBarResult =
+            scaffoldState.snackbarHostState.showSnackbar(
+                message = message,
+                actionLabel = actionLabel,
+                duration = SnackbarDuration.Long
+            )
+        if (snackBarResult == SnackbarResult.ActionPerformed) {
+            action?.invoke()
+        }
+    }
+}
+
+@Composable
+fun NewsListScreenCompose(
+    viewModel: NewsListViewModel,
+    onNewsClicked: ((News) -> Unit),
+    onErrorRetry: (() -> Unit),
+    onRefreshNewsList: (() -> Unit)
+) {
+    val scaffoldState = rememberScaffoldState()
+    Scaffold(
+        scaffoldState = scaffoldState,
+        topBar = {
+            TopAppBar(
+                title = { Text(text = stringResource(id = R.string.news_list_title)) },
+                elevation = 2.dp
+            )
+        },
+        content = { innerPadding ->
+            Surface(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
+                color = MaterialTheme.colors.background
+            ) {
+                val uiState = viewModel.uiState.collectAsState()
+                val uiStateValue = uiState.value
+                if (uiStateValue.isInnit) {
+                    LoaderFullScreen()
+                } else {
+                    SwipeRefresh(
+                        state = rememberSwipeRefreshState(uiStateValue.isLoading),
+                        onRefresh = { onRefreshNewsList.invoke() }
+                    ) {
+                        if (uiStateValue.throwable != null) {
+                            if (uiStateValue.news.isEmpty()) {
+                                ErrorStateCompose(
+                                    uiStateValue.throwable.formatError()
+                                ) {
+                                    onErrorRetry.invoke()
+                                }
+                            } else {
+                                NewsListCompose(news = uiState.value.news) {
+                                    onNewsClicked.invoke(it)
+                                }
+                                ShowSnackBarError(
+                                    scaffoldState = scaffoldState,
+                                    message = stringResource(
+                                        id =
+                                        uiStateValue.throwable.formatError()
+                                    ),
+                                    actionLabel = stringResource(id = R.string.retry)
+                                ) {
+                                    onErrorRetry.invoke()
+                                }
+                            }
+                        } else {
+                            if (uiStateValue.news.isEmpty()) {
+                                ErrorStateCompose(resString = R.string.empty_news_list) {
+                                    onErrorRetry.invoke()
+                                }
+                            } else {
+                                NewsListCompose(uiStateValue.news) {
+                                    onNewsClicked.invoke(it)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    )
 }

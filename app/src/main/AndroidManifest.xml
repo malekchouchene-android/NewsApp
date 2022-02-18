@@ -3,6 +3,7 @@
     package="com.example.newsapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".ui.NewsApplication"
         android:allowBackup="true"
@@ -12,7 +13,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NewsApp">
         <activity
-            android:name=".ui.newslist.MainActivity"
+            android:name=".ui.newsDetails.NewsDetailsActivity"
+            android:theme="@style/Theme.NewsApp"
+            android:exported="false" />
+        <activity
+            android:name=".ui.newslist.NewsListActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.NewsApp">
